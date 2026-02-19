@@ -1,0 +1,603 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    Job Seeker Dashboard | CareerHub
+{% endblock %}
+
+{% block content %}
+    <div class="flex min-h-screen bg-gray-50">
+        <!-- Sidebar -->
+        <div id="sidebar" class="fixed top-16 left-0 bottom-0 z-50 w-64 bg-gray-900 text-white flex-col flex-shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out md:flex md:static md:inset-auto">
+            <div class="p-6 text-center border-b border-gray-800">
+                {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="w-24 h-24 rounded-full mx-auto mb-3 border-2 border-gray-600 object-cover">
+                {% else %}
+                    <img src="{% static 'img/default_avatar.png' %}" alt="Default Profile" class="w-24 h-24 rounded-full mx-auto mb-3 border-2 border-gray-600 object-cover">
+                {% endif %}
+                <h5 class="text-lg font-semibold">{{ user.username }}</h5>
+                <p class="text-gray-400">{{ profile.job_title|default:'Job Seeker' }}</p>
+                <p class="text-sm text-gray-500">Job Seeker</p>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#overview" class="tab-link flex items-center px-4 py-3 text-gray-200 hover:bg-gray-800 hover:text-white rounded-lg transition border-l-4 border-transparent hover:border-blue-500" data-tab="overview">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+                    Overview
+                </a>
+                <a href="#find-jobs" class="tab-link flex items-center px-4 py-3 text-gray-200 hover:bg-gray-800 hover:text-white rounded-lg transition border-l-4 border-transparent hover:border-blue-500" data-tab="find-jobs">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    Find Jobs
+                </a>
+                <a href="#applications" class="tab-link flex items-center px-4 py-3 text-gray-200 hover:bg-gray-800 hover:text-white rounded-lg transition border-l-4 border-transparent hover:border-blue-500 relative" data-tab="applications">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01m-.01 4h.01" /></svg>
+                    My Applications
+                    {% if pending_applications_count %}
+                        <span class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">{{ pending_applications_count }}</span>
+                    {% endif %}
+                </a>
+                <a href="#profile" class="tab-link flex items-center px-4 py-3 text-gray-200 hover:bg-gray-800 hover:text-white rounded-lg transition border-l-4 border-transparent hover:border-blue-500" data-tab="profile">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37 1 .608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    Profile Settings
+                </a>
+                <a href="{% url 'logout' %}" class="flex items-center px-4 py-3 text-gray-200 hover:bg-gray-800 hover:text-white rounded-lg transition border-l-4 border-transparent hover:border-blue-500">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+            <!-- Mobile Sidebar Toggle Button -->
+            <div class="md:hidden flex justify-between items-center mb-4">
+                <button id="sidebar-toggle" class="p-2 fixed top-3 right-3 z-50 rounded-lg hover:bg-gray-300 focus:ring-2 focus:ring-blue-500">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <h1 class="text-xl font-bold text-gray-900">Welcome, {{ user.username }}!</h1>
+            </div>
+
+            <!-- Tabbed Content -->
+            <div id="tab-content">
+                <!-- Overview Tab -->
+                <div id="overview" class="tab-pane {% if active_tab == 'overview' %}active{% else %}hidden{% endif %}">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-2 space-y-6">
+                            <!-- Quick Actions -->
+                            <div class="bg-white p-6 rounded-xl shadow-lg">
+                                <h5 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h5>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <button class="tab-link flex flex-col items-center justify-center p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition" data-tab="find-jobs">
+                                        <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                        Find Jobs
+                                    </button>
+                                    <button class="tab-link flex flex-col items-center justify-center p-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition" data-tab="applications">
+                                        <svg class="w-6 h-6 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01m-.01 4h.01" /></svg>
+                                        Track Applications
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Recent Applications -->
+                            <div class="bg-white p-6 rounded-xl shadow-lg">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h5 class="text-lg font-semibold text-gray-900">Recent Applications</h5>
+                                    <button class="tab-link text-blue-600 hover:text-blue-800 text-sm" data-tab="applications">View All</button>
+                                </div>
+                                {% if recent_applications %}
+                                    {% for application in recent_applications %}
+                                        <div class="flex items-center p-3 mb-3 bg-gray-50 rounded-lg last:mb-0">
+                                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                                                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex justify-between items-center">
+                                                    <h6 class="text-sm font-semibold text-gray-800">{{ application.job.title }}</h6>
+                                                    <span class="px-2 py-1 text-xs font-medium rounded-full {% if application.status == 'Pending' %}bg-yellow-100 text-yellow-800{% elif application.status == 'Accepted' %}bg-green-100 text-green-800{% elif application.status == 'Rejected' %}bg-red-100 text-red-800{% endif %}">
+                                                        {{ application.status|title }}
+                                                    </span>
+                                                </div>
+                                                <p class="text-sm text-gray-600">{{ application.job.company }}</p>
+                                                <p class="text-xs text-gray-500"><svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>{{ application.applied_at|date:"M d, Y" }}</p>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="p-4 text-center text-gray-600 bg-gray-100 rounded-lg">
+                                        No recent applications. <button class="tab-link text-blue-600 hover:text-blue-800" data-tab="find-jobs">Apply now!</button>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <!-- Right Column -->
+                        <div class="space-y-6">
+                            
+                            <!-- Profile Card -->
+                            <div class="bg-white p-6 rounded-xl shadow-lg">
+                                <div class="flex items-center mb-4">
+                                    {% if user.profile_picture %}
+                                        <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="w-12 h-12 rounded-full mr-3 object-cover">
+                                    {% else %}
+                                        <img src="{% static 'img/default_avatar.png' %}" alt="Default Profile" class="w-12 h-12 rounded-full mr-3 object-cover">
+                                    {% endif %}
+                                    <div>
+                                        <h5 class="text-lg font-semibold text-gray-900">{{ user.username }}</h5>
+                                        <p class="text-sm text-gray-600">{{ profile.job_title|default:'Job Seeker' }}</p>
+                                    </div>
+                                </div>
+                                <div class="space-y-3">
+                                    <p class="text-sm text-gray-600"><svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>{{ user.email }}</p>
+                                    <p class="text-sm text-gray-600"><svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>{{ user.phone|default:'Not provided' }}</p>
+                                    {% if profile.resume %}
+                                        <p class="text-sm text-gray-600"><svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg><a href="{{ profile.resume.url }}" target="_blank" class="text-blue-600 hover:text-blue-800">Download Resume</a></p>
+                                    {% endif %}
+                                </div>
+                                <div class="mt-4 text-center">
+                                    <button class="tab-link inline-block px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition" data-tab="profile">Edit Profile</button>
+                                </div>
+                            </div>
+                            <div class="bg-white p-6 rounded-xl shadow-lg">
+                                <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-transform transform hover:-translate-y-1">
+                                    <h6 class="text-sm text-gray-500 mb-2">Applications Submitted</h6>
+                                    <p class="text-3xl font-bold text-blue-600">{{ applications_count }}</p>
+                                    <div class="mt-3 h-1 bg-gray-200 rounded-full"><div class="h-full bg-blue-500 rounded-full" style="width: {{ applications_progress }}%"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Find Jobs Tab -->
+                <div id="find-jobs" class="tab-pane {% if active_tab == 'find-jobs' %}active{% else %}hidden{% endif %}">
+                    <h1 class="text-2xl font-bold text-gray-900 mb-6">Find Jobs</h1>
+                    <div class="bg-white rounded-2xl shadow-xl p-8 mb-10">
+                        <form method="GET" action="{% url 'dashboard' %}" class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                            <input type="hidden" name="tab" value="find-jobs">
+                            <div class="md:col-span-2">
+                                <label for="search" class="block text-sm font-medium text-gray-700 mb-1 ml-1">Job Title</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <input id="search" type="text" name="q" class="w-full pl-10 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600" placeholder="Search job titles..." value="{{ search_query }}">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="job_type" class="block text-sm font-medium text-gray-700 mb-1 ml-1">Job Type</label>
+                                <select id="job_type" name="job_type" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600">
+                                    <option value="">All Job Types</option>
+                                    <option value="Full Time" {% if job_type_filter == "Full Time" %}selected{% endif %}>Full Time</option>
+                                    <option value="Part Time" {% if job_type_filter == "Part Time" %}selected{% endif %}>Part Time</option>
+                                    <option value="Freelance" {% if job_type_filter == "Freelance" %}selected{% endif %}>Freelance</option>
+                                    <option value="Internship" {% if job_type_filter == "Internship" %}selected{% endif %}>Internship</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="location" class="block text-sm font-medium text-gray-700 mb-1 ml-1">Location</label>
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <input id="location" type="text" name="location" class="w-full pl-10 px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600" placeholder="Any location..." value="{{ location_filter }}">
+                                </div>
+                            </div>
+                            <div>
+                                <label for="sort" class="block text-sm font-medium text-gray-700 mb-1 ml-1">Sort By</label>
+                                <select id="sort" name="sort" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600">
+                                    <option value="newest" {% if sort_option == "newest" %}selected{% endif %}>Newest First</option>
+                                    <option value="highest_salary" {% if sort_option == "highest_salary" %}selected{% endif %}>Highest Salary First</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-5 flex justify-center">
+                                <button type="submit" class="w-full md:w-auto px-8 py-4 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 focus:ring-offset-2 transition">
+                                    <div class="flex items-center justify-center">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                                        </svg>
+                                        Apply Filters
+                                    </div>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="grid grid-cols-1 gap-8">
+                        {% for job in jobs %}
+                            <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100">
+                                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                                    <div class="flex-1">
+                                        <div class="flex items-center space-x-4 mb-6">
+                                            <div class="relative">
+                                                <img src="{{ job.posted_by.profile_picture.url|default:'https://via.placeholder.com/48' }}" alt="{{ job.company }}" class="w-16 h-16 rounded-full object-cover border-2 border-gray-100 shadow">
+                                            </div>
+                                            <div>
+                                                <h3 class="text-2xl font-bold text-gray-800">{{ job.title }}</h3>
+                                                <p class="text-gray-600 flex items-center">{{ job.company }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                                            <div class="flex items-center">
+                                                <div class="mr-3 p-2 bg-blue-100 rounded-lg">
+                                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-500">Location</p>
+                                                    <p class="text-gray-800 font-medium">{{ job.location }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <div class="mr-3 p-2 bg-purple-100 rounded-lg">
+                                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-500">Job Type</p>
+                                                    <p class="text-gray-800 font-medium">{{ job.job_type }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <div class="mr-3 p-2 bg-green-100 rounded-lg">
+                                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <p class="text-sm font-medium text-gray-500">Salary</p>
+                                                    <p class="text-gray-800 font-medium">{% if job.salary %}{{ job.salary }}{% else %}Not disclosed{% endif %}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="bg-gray-50 p-4 rounded-xl mb-4">
+                                            <p class="text-gray-700 leading-relaxed">{{ job.description|truncatewords:20 }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-wrap gap-3 mt-4 md:mt-0 md:ml-6">
+                                        {% if user.is_authenticated %}
+                                        {% if job.has_applied %}
+                                            <span class="inline-flex items-center px-5 py-3 bg-gray-400 text-white font-medium rounded-xl cursor-not-allowed">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                Applied
+                                            </span>
+                                        {% else %}
+                                            <button data-job-id="{{ job.id }}" class="apply-now-btn inline-flex items-center px-5 py-3 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                Apply Now
+                                            </button>
+                                        {% endif %}
+                                    {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="bg-white rounded-2xl shadow-lg p-10 text-center border border-gray-100">
+                                <p class="text-xl text-gray-600 mb-4">No jobs found matching your criteria.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if jobs_page_obj.paginator.num_pages > 1 %}
+                        <div class="mt-12 flex justify-center">
+                            <nav class="inline-flex rounded-xl shadow-lg overflow-hidden">
+                                <span class="inline-flex items-center px-6 py-3 text-gray-700 bg-white border border-gray-200 font-medium">
+                                    Page {{ jobs_page_obj.number }} of {{ jobs_page_obj.paginator.num_pages }}
+                                </span>
+                                {% if jobs_page_obj.has_previous %}
+                                    <a href="?tab=find-jobs&jobs_page=1{% if search_query %}&q={{ search_query|urlencode }}{% endif %}{% if job_type_filter %}&job_type={{ job_type_filter|urlencode }}{% endif %}{% if location_filter %}&location={{ location_filter|urlencode }}{% endif %}{% if sort_option %}&sort={{ sort_option|urlencode }}{% endif %}" class="inline-flex items-center px-4 py-3 bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 transition">
+                                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                                        </svg>
+                                        First
+                                    </a>
+                                    <a href="?tab=find-jobs&jobs_page={{ jobs_page_obj.previous_page_number }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}{% if job_type_filter %}&job_type={{ job_type_filter|urlencode }}{% endif %}{% if location_filter %}&location={{ location_filter|urlencode }}{% endif %}{% if sort_option %}&sort={{ sort_option|urlencode }}{% endif %}" class="inline-flex items-center px-4 py-3 bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 transition">
+                                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                        Prev
+                                    </a>
+                                {% endif %}
+                                {% if jobs_page_obj.has_next %}
+                                    <a href="?tab=find-jobs&jobs_page={{ jobs_page_obj.next_page_number }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}{% if job_type_filter %}&job_type={{ job_type_filter|urlencode }}{% endif %}{% if location_filter %}&location={{ location_filter|urlencode }}{% endif %}{% if sort_option %}&sort={{ sort_option|urlencode }}{% endif %}" class="inline-flex items-center px-4 py-3 bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 transition">
+                                        Next
+                                        <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                    <a href="?tab=find-jobs&jobs_page={{ jobs_page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query|urlencode }}{% endif %}{% if job_type_filter %}&job_type={{ job_type_filter|urlencode }}{% endif %}{% if location_filter %}&location={{ location_filter|urlencode }}{% endif %}{% if sort_option %}&sort={{ sort_option|urlencode }}{% endif %}" class="inline-flex items-center px-4 py-3 bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 transition">
+                                        Last
+                                        <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                {% endif %}
+                            </nav>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- My Applications Tab -->
+                <div id="applications" class="tab-pane {% if active_tab == 'applications' %}active{% else %}hidden{% endif %}">
+                    <h1 class="text-2xl font-bold text-gray-900 mb-6">Your Job Applications</h1>
+                    <div class="space-y-6">
+                        {% for application in applications %}
+                            <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-transform transform hover:-translate-y-1">
+                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                                    <div>
+                                        <h5 class="text-xl font-semibold text-gray-900">{{ application.job.title }}</h5>
+                                        <p class="text-gray-600">{{ application.job.company }}</p>
+                                        <p class="mt-2 text-sm text-gray-500">
+                                            <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            Applied On: {{ application.applied_at|date:"M d, Y" }}
+                                        </p>
+                                        {% if application.get_resume %}
+                                            <p class="mt-2 text-sm text-gray-500">
+                                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                </svg>
+                                                <a href="{{ application.get_resume }}" target="_blank" class="text-blue-600 hover:text-blue-800">Download Resume</a>
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="mt-4 sm:mt-0 sm:text-right">
+                                        <span class="inline-block px-3 py-1 text-sm font-medium rounded-full {% if application.status == 'Pending' %}bg-yellow-100 text-yellow-800{% elif application.status == 'Accepted' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                            {{ application.status }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                                <p class="text-gray-600">You haven't applied for any jobs yet.</p>
+                                <button class="tab-link mt-2 text-blue-600 hover:text-blue-800" data-tab="find-jobs">Start applying now!</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if applications_page_obj.paginator.num_pages > 1 %}
+                        <div class="mt-12 flex justify-center">
+                            <nav class="inline-flex rounded-xl shadow-lg overflow-hidden">
+                                <span class="inline-flex items-center px-6 py-3 text-gray-700 bg-white border border-gray-200 font-medium">
+                                    Page {{ applications_page_obj.number }} of {{ applications_page_obj.paginator.num_pages }}
+                                </span>
+                                {% if applications_page_obj.has_previous %}
+                                    <a href="?tab=applications&applications_page=1" class="inline-flex items-center px-4 py-3 bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 transition">
+                                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                                        </svg>
+                                        First
+                                    </a>
+                                    <a href="?tab=applications&applications_page={{ applications_page_obj.previous_page_number }}" class="inline-flex items-center px-4 py-3 bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 transition">
+                                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                        Prev
+                                    </a>
+                                {% endif %}
+                                {% if applications_page_obj.has_next %}
+                                    <a href="?tab=applications&applications_page={{ applications_page_obj.next_page_number }}" class="inline-flex items-center px-4 py-3 bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 transition">
+                                        Next
+                                        <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                    <a href="?tab=applications&applications_page={{ applications_page_obj.paginator.num_pages }}" class="inline-flex items-center px-4 py-3 bg-white border border-gray-200 text-blue-600 hover:bg-blue-50 transition">
+                                        Last
+                                        <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                {% endif %}
+                            </nav>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Profile Settings Tab -->
+                <div id="profile" class="tab-pane {% if active_tab == 'profile' %}active{% else %}hidden{% endif %}">
+                    <h1 class="text-2xl font-bold text-gray-900 mb-6">Profile Settings</h1>
+                    <form method="POST" action={%url 'edit_profile'%} enctype="multipart/form-data" class="bg-white rounded-xl shadow-lg p-6 space-y-6">
+                        {% csrf_token %}
+                        <input type="hidden" name="tab" value="profile">
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-semibold text-gray-900">Account Details</h4>
+                            {% for field in user_form %}
+                                {% if field.name != 'password1' and field.name != 'password2' and field.name != 'is_recruiter' %}
+                                    <div>
+                                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ field.label }}</label>
+                                        <input type="{{ field.field.widget.input_type|default:'text' }}"
+                                               name="{{ field.name }}"
+                                               id="{{ field.id_for_label }}"
+                                               class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 {% if field.errors %}border-red-500{% endif %}"
+                                               placeholder="{{ field.label }}"
+                                               value="{{ field.value|default_if_none:'' }}"
+                                               {% if field.field.required %}required{% endif %}>
+                                        {% if field.errors %}
+                                            <p class="mt-1 text-sm text-red-600">{{ field.errors.0 }}</p>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-semibold text-gray-900">Profile Information</h4>
+                            <div>
+                                <label for="{{ profile_form.resume.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Resume</label>
+                                <input type="file"
+                                       name="{{ profile_form.resume.name }}"
+                                       id="{{ profile_form.resume.id_for_label }}"
+                                       class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 {% if profile_form.resume.errors %}border-red-500{% endif %}"
+                                       {% if profile_form.resume.field.required %}required{% endif %}>
+                                {% if profile.resume %}
+                                    <p class="mt-1 text-sm text-gray-500">Current: <a href="{{ profile.resume.url }}" target="_blank" class="text-blue-600 hover:text-blue-800">View Resume</a></p>
+                                {% endif %}
+                                {% if profile_form.resume.errors %}
+                                    <p class="mt-1 text-sm text-red-600">{{ profile_form.resume.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-full hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">Save Changes</button>
+                    </form>
+                </div>
+                <!-- Apply Job Modal -->
+<div id="apply-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-md">
+        <div class="flex justify-between items-center border-b border-gray-200 pb-4">
+            <h2 class="text-xl font-semibold text-gray-900">Apply for Job</h2>
+            <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        <form id="apply-form" method="POST" action="{% url 'apply_for_job' 0 %}" class="space-y-4 mt-4" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="job_id" id="apply-job-id">
+            <div>
+                <label for="resume" class="block text-sm font-medium text-gray-700">Upload Resume</label>
+                <input type="file" name="resume" id="resume" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+                <label for="cover_letter" class="block text-sm font-medium text-gray-700">Cover Letter (Optional)</label>
+                <textarea name="cover_letter" id="cover_letter" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" rows="4" placeholder="Write a brief cover letter..."></textarea>
+            </div>
+            <button type="submit" class="w-full px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700">Submit Application</button>
+        </form>
+        <div id="apply-success" class="hidden text-green-600 text-center mt-4">Application submitted successfully!</div>
+    </div>
+</div>
+            </div>
+        </main>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const tabLinks = document.querySelectorAll('.tab-link');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    const paginationLinks = document.querySelectorAll('nav a');
+    const applyModal = document.getElementById('apply-modal');
+    const closeModal = document.getElementById('close-modal');
+    const applyForm = document.getElementById('apply-form');
+    const applySuccess = document.getElementById('apply-success');
+    const applyJobId = document.getElementById('apply-job-id');
+
+    // Sidebar toggle for mobile
+    sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('-translate-x-full');
+    });
+
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', function(event) {
+        if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target) && !sidebar.classList.contains('-translate-x-full')) {
+            sidebar.classList.add('-translate-x-full');
+        }
+    });
+
+    // Tab switching for sidebar links
+    tabLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tabId = this.getAttribute('data-tab');
+            tabPanes.forEach(pane => {
+                pane.classList.add('hidden');
+                if (pane.id === tabId) {
+                    pane.classList.remove('hidden');
+                    pane.classList.add('animate-fade-in');
+                }
+            });
+            tabLinks.forEach(l => l.classList.remove('bg-gray-800', 'text-white', 'border-blue-500'));
+            this.classList.add('bg-gray-800', 'text-white', 'border-blue-500');
+            history.pushState({}, '', `#${tabId}`);
+        });
+    });
+
+    // Handle Apply Now button clicks
+    document.querySelectorAll('.apply-now-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const jobId = this.getAttribute('data-job-id');
+            if (!jobId || jobId === '0') {
+                alert('Error: No valid job ID found. Please contact support.');
+                return;
+            }
+            applyJobId.value = jobId;
+            applyModal.classList.remove('hidden');
+            applySuccess.classList.add('hidden');
+        });
+    });
+
+    // Close modal
+    closeModal.addEventListener('click', function() {
+        applyModal.classList.add('hidden');
+    });
+
+    // Handle form submission via AJAX
+    applyForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const jobId = applyJobId.value;
+        if (!jobId || jobId === '0') {
+            alert('Error: Job ID not set. Please try again.');
+            return;
+        }
+        const url = `/applications/apply/${jobId}/`;
+        const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+
+        fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(`HTTP error! status: ${response.status}, response: ${text}`); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                applyForm.reset();
+                applySuccess.classList.remove('hidden');
+                setTimeout(() => {
+                    applyModal.classList.add('hidden');
+                    location.reload();
+                }, 2000);
+            } else {
+                let errorMessage = 'Error submitting application. Please try again.';
+                if (data.errors) {
+                    errorMessage = Object.values(data.errors).flat().join(' ');
+                } else if (data.error) {
+                    errorMessage = data.error;
+                }
+                alert(errorMessage);
+            }
+        })
+        .catch(error => {
+            alert(`Failed to submit application: ${error.message}.`);
+        });
+    });
+
+    // Close modal when clicking outside
+    window.addEventListener('click', function(event) {
+        if (event.target === applyModal) {
+            applyModal.classList.add('hidden');
+        }
+    });
+});
+</script>
+{% endblock %}

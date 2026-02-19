@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CareerHub - Find Your Dream Job{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #6EE7B7 0%, #3B82F6 100%);
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="font-sans antialiased bg-gray-50">
+    <!-- Navbar -->
+    {% block navbar %}
+        {% if request.resolver_match.url_name == 'dashboard' %}
+            <!-- Simplified Navbar for Dashboard -->
+            <nav class="bg-white shadow-lg sticky top-0 z-100">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-center h-16 items-center">
+                        <a href="{% url 'home' %}" class="text-2xl font-bold text-blue-600">CareerHub</a>
+                    </div>
+                </div>
+            </nav>
+        {% else %}
+            <!-- Full Navbar for Other Pages -->
+            <nav class="bg-white shadow-lg sticky top-0 z-100">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between h-16 items-center">
+                        <div class="flex items-center">
+                            <a href="{% url 'home' %}" class="text-2xl font-bold text-blue-600">CareerHub</a>
+                        </div>
+                        <div class="hidden md:flex items-center space-x-8">
+                            <a href="{% url 'home' %}" class="text-gray-700 hover:text-blue-600 transition">Home</a>
+                            <a href="{% url 'list_jobs' %}" class="text-gray-700 hover:text-blue-600 transition">Find Jobs</a>
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'dashboard' %}" class="text-gray-700 hover:text-blue-600 transition">Dashboard</a>
+                                <a href="{% url 'logout' %}" class="text-gray-700 hover:text-blue-600 transition">Logout</a>
+                            {% else %}
+                                <a href="{% url 'register' %}" class="text-gray-700 hover:text-blue-600 transition">Register</a>
+                                <a href="{% url 'login' %}" class="text-gray-700 hover:text-blue-600 transition">Login</a>
+                            {% endif %}
+                        </div>
+                        <div class="md:hidden">
+                            <button class="mobile-menu-button p-2" onclick="toggleMobileMenu()">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Mobile Menu -->
+                <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+                    <div class="px-4 py-2 space-y-2">
+                        <a href="{% url 'home' %}" class="block text-gray-700 hover:text-blue-600 transition">Home</a>
+                        <a href="{% url 'list_jobs' %}" class="block text-gray-700 hover:text-blue-600 transition">Find Jobs</a>
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'dashboard' %}" class="block text-gray-700 hover:text-blue-600 transition">Dashboard</a>
+                            <a href="{% url 'logout' %}" class="block text-gray-700 hover:text-blue-600 transition">Logout</a>
+                        {% else %}
+                            <a href="{% url 'register' %}" class="block text-gray-700 hover:text-blue-600 transition">Register</a>
+                            <a href="{% url 'login' %}" class="block text-gray-700 hover:text-blue-600 transition">Login</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </nav>
+        {% endif %}
+    {% endblock navbar %}
+
+    <!-- Main Content -->
+    <main>
+        {% if messages %}
+    <div id="message-container" class="fixed top-5 left-1/2 transform -translate-x-1/2 w-max px-4 py-2 rounded-md shadow-md">
+        {% for message in messages %}
+            <!-- Apply different classes based on message tags -->
+            <p class="{% if message.tags == 'success' %}bg-green-500 text-white{% elif message.tags == 'error' %}bg-red-500 text-white{% else %}bg-gray-500 text-white{% endif %} px-4 py-2 rounded-md">
+                {{ message }}
+            </p>
+        {% endfor %}
+    </div>
+
+    <script>
+        // Automatically remove message after 3 seconds
+        setTimeout(function() {
+            var messageContainer = document.getElementById('message-container');
+            if (messageContainer) {
+                messageContainer.style.display = 'none';
+            }
+        }, 3000);
+    </script>
+{% endif %}
+        {% block content %}
+        <!-- Hero Section -->
+        <div class="gradient-bg text-white py-20 md:py-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">Find Your Dream Career Today</h1>
+                <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">Connect with top employers and discover opportunities that match your skills and aspirations.</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="{% url 'register' %}" class="bg-white text-blue-600 px-8 py-3 rounded-full font-medium hover:bg-blue-50 transition shadow-lg">Get Started</a>
+                    <a href="{% url 'list_jobs' %}" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-medium hover:bg-white hover:text-blue-600 transition">Browse Jobs</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Jobs -->
+        <section class="py-16 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Featured Opportunities</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    {% block featured_jobs %}
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition p-6 border border-gray-200">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <img src="https://logo.clearbit.com/google.com" alt="Google" class="w-12 h-12 rounded-full">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800">Software Engineer</h3>
+                                <p class="text-gray-600">Google</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-medium">Full-time</span>
+                            <span class="text-gray-600">Remote</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition p-6 border border-gray-200">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <img src="https://logo.clearbit.com/microsoft.com" alt="Microsoft" class="w-12 h-12 rounded-full">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800">Data Scientist</h3>
+                                <p class="text-gray-600">Microsoft</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-medium">Full-time</span>
+                            <span class="text-gray-600">Hybrid</span>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition p-6 border border-gray-200">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <img src="https://logo.clearbit.com/amazon.com" alt="Amazon" class="w-12 h-12 rounded-full">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800">Web Developer</h3>
+                                <p class="text-gray-600">Amazon</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-medium">Full-time</span>
+                            <span class="text-gray-600">On-site</span>
+                        </div>
+                    </div>
+                    {% endblock %}
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h2 class="text-3xl font-bold mb-12 text-gray-800">How It Works</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-white rounded-xl p-8 shadow-lg">
+                        <div class="text-blue-600 text-4xl mb-4">1</div>
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">Create Account</h3>
+                        <p class="text-gray-600">Sign up as a job seeker or employer in minutes.</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-8 shadow-lg">
+                        <div class="text-blue-600 text-4xl mb-4">2</div>
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">Find or Post Jobs</h3>
+                        <p class="text-gray-600">Browse opportunities or post openings to find talent.</p>
+                    </div>
+                    <div class="bg-white rounded-xl p-8 shadow-lg">
+                        <div class="text-blue-600 text-4xl mb-4">3</div>
+                        <h3 class="text-xl font-semibold mb-4 text-gray-800">Start Your Journey</h3>
+                        <p class="text-gray-600">Get hired or fill positions with qualified candidates.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">CareerHub</h3>
+                    <p class="text-gray-400">Connecting talent with opportunity</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'home' %}" class="text-gray-400 hover:text-white transition">Home</a></li>
+                        <li><a href="{% url 'list_jobs' %}" class="text-gray-400 hover:text-white transition">Find Jobs</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Legal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-8 pt-8 border-t border-gray-800 text-center">
+                <p class="text-gray-400">© 2025 CareerHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Base Scripts -->
+    <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.classList.toggle('hidden');
+            } else {
+                console.error('Mobile menu element not found');
+            }
+        }
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Track Job Applications | CareerHub
+{% endblock %}
+
+{% block content %}
+    <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-gray-900">Your Job Applications</h2>
+                <p class="mt-2 text-gray-600">Track the status of your job applications</p>
+            </div>
+
+            <!-- Applications List -->
+            <div class="space-y-6">
+                {% for application in page_obj %}
+                    <div class="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-transform transform hover:-translate-y-1">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                            <div>
+                                <h5 class="text-xl font-semibold text-gray-900">{{ application.job.title }}</h5>
+                                <p class="text-gray-600">{{ application.job.company }}</p>
+                                <p class="mt-2 text-sm text-gray-500">
+                                    <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    Applied On: {{ application.applied_at|date:"M d, Y" }}
+                                </p>
+                                {% if application.get_resume %}
+                                    <p class="mt-2 text-sm text-gray-500">
+                                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                        </svg>
+                                        <a href="{{ application.get_resume }}" target="_blank" class="text-blue-600 hover:text-blue-800">Download Resume</a>
+                                    </p>
+                                {% endif %}
+                            </div>
+                            <div class="mt-4 sm:mt-0 sm:text-right">
+                                <span class="inline-block px-3 py-1 text-sm font-medium rounded-full 
+                                    {% if application.status == 'Pending' %}bg-yellow-100 text-yellow-800
+                                    {% elif application.status == 'Accepted' %}bg-green-100 text-green-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ application.status }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+                        <p class="text-gray-600">You haven't applied for any jobs yet.</p>
+                        <a href="{% url 'list_jobs' %}" class="mt-2 inline-block text-blue-600 hover:text-blue-800">Start applying now!</a>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if page_obj.paginator.num_pages > 1 %}
+                <div class="mt-8 flex justify-center items-center space-x-2">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-blue-600 hover:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
+                            First
+                        </a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-blue-600 hover:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
+                            Previous
+                        </a>
+                    {% endif %}
+
+                    <span class="px-4 py-2 bg-gray-100 rounded-lg text-gray-700">
+                        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-blue-600 hover:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
+                            Next
+                        </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-blue-600 hover:bg-blue-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
+                            Last
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.space-y-6 > div');
+            cards.forEach(card => card.classList.add('animate-fade-in'));
+        });
+    </script>
+{% endblock %}

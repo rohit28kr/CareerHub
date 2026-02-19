@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Submitted - CareerHub</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f4f7fa; color: #333333; line-height: 1.6;">
+    <!-- Wrapper -->
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; margin: 20px auto; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);">
+        <!-- Header -->
+        <tr>
+            <td style="background-color: #007bff; padding: 20px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+                <h1 style="margin: 0; font-size: 24px; color: #ffffff; font-weight: 700;">CareerHub</h1>
+                <p style="margin: 5px 0 0; font-size: 14px; color: #cce5ff;">Your Career Journey Starts Here</p>
+            </td>
+        </tr>
+        <!-- Content -->
+        <tr>
+            <td style="padding: 30px;">
+                <h2 style="font-size: 20px; color: #333333; margin: 0 0 15px;">Hello {{ applicant }},</h2>
+                <p style="font-size: 16px; margin: 0 0 20px;">Thank you for applying to <strong>{{ job_title }}</strong> at <strong>{{ company }}</strong>! We’ve successfully received your application.</p>
+                
+                <!-- Application Details -->
+                <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 20px 0; background-color: #f8f9fa; border-radius: 6px; padding: 15px;">
+                    <tr>
+                        <td style="font-size: 16px; color: #333333;">
+                            <strong>Job Title:</strong> {{ job_title }}<br>
+                            <strong>Company:</strong> {{ company }}<br>
+                            <strong>Applied On:</strong> {{ applied_at|date:"M d, Y H:i" }}<br>
+                            <strong>Status:</strong> Pending
+                        </td>
+                    </tr>
+                </table>
+
+                <p style="font-size: 16px; margin: 20px 0;">We’ll notify you once the recruiter reviews your application. In the meantime, you can track your application status in your <a href="{{ protocol }}://{{ domain }}{% url 'track_applications' %}" style="color: #007bff; text-decoration: none;">CareerHub dashboard</a>.</p>
+                <p style="font-size: 16px; margin: 20px 0;">Best of luck!<br>The CareerHub Team</p>
+            </td>
+        </tr>
+        <!-- Footer -->
+        <tr>
+            <td style="background-color: #f8f9fa; padding: 20px; text-align: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+                <p style="font-size: 12px; color: #6c757d; margin: 0;">© 2025 CareerHub. All rights reserved.</p>
+                <p style="font-size: 12px; color: #6c757d; margin: 5px 0 0;">
+                    <a href="https://carrerhub.pythonanywhere.com" style="color: #007bff; text-decoration: none;">Visit CareerHub</a> | 
+                    <a href="carrerhub.com@gmail.com" style="color: #007bff; text-decoration: none;">Contact Us</a>
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

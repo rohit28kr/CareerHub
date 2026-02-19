@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Delete Job | CareerHub
+{% endblock %}
+
+{% block content %}
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 text-center">
+            <!-- Warning Icon -->
+            <div class="flex justify-center">
+                <svg class="w-16 h-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+
+            <!-- Confirmation Message -->
+            <div class="space-y-4">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    Are You Sure?
+                </h2>
+                <p class="text-lg text-gray-600">
+                    Do you really want to delete the job posting "<span class="font-semibold">{{ job.title }}</span>"? This action cannot be undone.
+                </p>
+            </div>
+
+            <!-- Form and Actions -->
+            <form method="POST" class="space-y-4">
+                {% csrf_token %}
+                <button type="submit" 
+                        class="w-full px-6 py-3 bg-red-600 text-white font-medium rounded-full hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition">
+                    Yes, Delete
+                </button>
+                <a href="{% url 'list_jobs' %}" 
+                   class="block w-full px-6 py-3 bg-gray-200 text-gray-700 font-medium rounded-full hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition">
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.max-w-md');
+            container.classList.add('animate-fade-in');
+        });
+    </script>
+{% endblock %}

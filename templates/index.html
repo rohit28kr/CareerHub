@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    CareerHub - Find Your Dream Job
+{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <div class="gradient-bg text-white py-20 md:py-32">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 animate-fade-in">Find Your Dream Career Today</h1>
+            <p class="text-lg md:text-xl mb-8 max-w-2xl mx-auto">Connect with top employers and discover opportunities that match your skills and aspirations.</p>
+            <!-- Search Bar -->
+            <form action="{% url 'list_jobs' %}" method="GET" class="max-w-xl mx-auto mb-8">
+                <div class="flex items-center bg-white rounded-full shadow-lg">
+                    <input type="text" name="q" placeholder="Search jobs..." class="flex-1 px-6 py-3 rounded-full focus:outline-none text-gray-700">
+                    <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition">Search</button>
+                </div>
+            </form>
+            <div class="flex flex-wrap justify-center gap-4">
+                {% if user.is_authenticated %}
+                {% if user.is_recruiter%}
+                <a href="{% url 'post_job' %}" class="bg-white text-blue-600 px-8 py-3 rounded-full font-medium hover:bg-blue-50 transition shadow-lg">Post Jobs</a>
+                {%else%}
+                <a href="{% url 'list_jobs' %}" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-medium hover:bg-white hover:text-blue-600 transition">Browse Jobs</a>
+                {%endif%}
+                {% else %}
+                <a href="{% url 'register' %}" class="bg-white text-blue-600 px-8 py-3 rounded-full font-medium hover:bg-blue-50 transition shadow-lg">Get Started</a>
+                <a href="{% url 'list_jobs' %}" class="bg-transparent border-2 border-white text-white px-8 py-3 rounded-full font-medium hover:bg-white hover:text-blue-600 transition">Browse Jobs</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Jobs -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Featured Opportunities</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {% block featured_jobs %}
+                {% for job in featured_jobs %}
+                    <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition p-6 border border-gray-200">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <img src="{{ job.posted_by.profile_picture.url }}" alt="{{ job.company_name }}" class="w-12 h-12 rounded-full">
+                            <div>
+                                <h3 class="text-xl font-semibold text-gray-800">{{ job.title }}</h3>
+                                <p class="text-gray-600">{{ job.company }}</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-blue-600 font-medium">{{ job.job_type }}</span>
+                            <span class="text-gray-600">{{ job.location }}</span>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-center col-span-3 text-gray-600">No featured jobs available at the moment.</p>
+                {% endfor %}
+                {% endblock %}
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl font-bold mb-12 text-gray-800">How It Works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white rounded-xl p-8 shadow-lg">
+                    <div class="text-blue-600 text-4xl mb-4">1</div>
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Create Account</h3>
+                    <p class="text-gray-600">Sign up as a job seeker or employer in minutes.</p>
+                </div>
+                <div class="bg-white rounded-xl p-8 shadow-lg">
+                    <div class="text-blue-600 text-4xl mb-4">2</div>
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Find or Post Jobs</h3>
+                    <p class="text-gray-600">Browse opportunities or post openings to find talent.</p>
+                </div>
+                <div class="bg-white rounded-xl p-8 shadow-lg">
+                    <div class="text-blue-600 text-4xl mb-4">3</div>
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Start Your Journey</h3>
+                    <p class="text-gray-600">Get hired or fill positions with qualified candidates.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {    
+            const jobCards = document.querySelectorAll('.bg-white.rounded-xl');
+            jobCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.classList.add('scale-105');
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.classList.remove('scale-105');
+                });
+            });
+        });
+    </script>
+{% endblock %}

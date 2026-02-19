@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Already Applied - CareerHub
+{% endblock %}
+
+{% block content %}
+    <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-md w-full space-y-8 text-center">
+            <!-- Error Icon -->
+            <div class="flex justify-center">
+                <svg class="w-16 h-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+            </div>
+
+            <!-- Error Message -->
+            <div class="space-y-4">
+                <h2 class="text-3xl font-bold text-gray-900">
+                    Application Already Submitted
+                </h2>
+                <p class="text-lg text-gray-600">
+                    You have already applied for this job.
+                </p>
+                <p class="text-md text-gray-500">
+                    You cannot apply for the same job more than once. Please explore other opportunities.
+                </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="space-y-4">
+                <a href="{% url 'list_jobs' %}" 
+                   class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-full hover:bg-blue-700 transition shadow-lg">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Job Listings
+                </a>
+                <div>
+                    <a href="{% url 'track_applications' %}" 
+                       class="text-blue-600 hover:text-blue-800 transition">
+                        View My Applications
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add fade-in animation
+            const container = document.querySelector('.max-w-md');
+            container.classList.add('animate-fade-in');
+        });
+    </script>
+{% endblock %}
